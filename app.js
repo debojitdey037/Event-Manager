@@ -14,8 +14,15 @@ const Event = require('./models/Event');
 // Initialize Express App
 const app = express();
 
-// Connect to MongoDB Database
-connectDB();
+// MongoDB connection middleware
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
 
 // Body and Cookie Parsing Middlewares
 app.use(express.json());
