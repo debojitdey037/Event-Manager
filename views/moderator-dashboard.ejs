@@ -1,0 +1,176 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<main class="container">
+  <div class="dashboard-header">
+    <div>
+      <h1 class="dashboard-title">Moderator Portal</h1>
+      <p class="dashboard-subtitle">Review event submissions, approve listings, and resolve community reports</p>
+    </div>
+    <a href="/moderation" class="btn btn-secondary"><i class="fa-solid fa-layer-group"></i> Full Moderation Queue</a>
+  </div>
+
+  <%- include('partials/messages') %>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon stat-amber"><i class="fa-solid fa-hourglass-half"></i></div>
+      <div class="stat-info">
+        <span class="stat-value"><%= stats.pendingEventsCount %></span>
+        <span class="stat-label">Pending Submissions</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon stat-green"><i class="fa-solid fa-circle-check"></i></div>
+      <div class="stat-info">
+        <span class="stat-value"><%= stats.approvedEventsCount %></span>
+        <span class="stat-label">Approved Events</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon stat-rose"><i class="fa-solid fa-flag"></i></div>
+      <div class="stat-info">
+        <span class="stat-value"><%= stats.pendingReportsCount %></span>
+        <span class="stat-label">Pending Reports</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pending Events Moderation Queue -->
+  <div class="glass-panel" style="margin-bottom: 2.5rem;">
+    <h2 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">
+      <i class="fa-solid fa-clock-rotate-left" style="color: var(--accent-amber);"></i> Pending Event Submissions (<%= pendingEvents.length %>)
+    </h2>
+
+    <% if (pendingEvents && pendingEvents.length > 0) { %>
+      <div class="data-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Event Title</th>
+              <th>Organizer</th>
+              <th>Category</th>
+              <th>Date & Location</th>
+              <th>Submitted</th>
+              <th>Moderation Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% pendingEvents.forEach(event => { %>
+              <tr>
+                <td>
+                  <a href="/events/<%= event._id %>" style="font-weight: 700; color: #fff;"><%= event.title %></a>
+                </td>
+                <td><%= event.organizer ? event.organizer.name : 'Unknown' %></td>
+                <td><span class="category-tag"><%= event.category %></span></td>
+                <td><%= new Date(event.eventDate).toLocaleDateString('en-US') %> (<%= event.location %>)</td>
+                <td style="font-size: 0.85rem; color: var(--text-muted);"><%= new Date(event.createdAt).toLocaleDateString('en-US') %></td>
+                <td>
+                  <div style="display: flex; gap: 0.5rem;">
+                    <form action="/moderation/events/<%= event._id %>/approve" method="POST" style="display: inline;">
+                      <button type="submit" class="btn btn-success btn-sm"><i class="fa-solid fa-check"></i> Approve</button>
+                    </form>
+                    <button onclick="openRejectModal('<%= event._id %>')" class="btn btn-danger btn-sm"><i class="fa-solid fa-xmark"></i> Reject</button>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div style="text-align: center; padding: 2rem;">
+        <i class="fa-solid fa-circle-check" style="font-size: 2.5rem; color: var(--accent-emerald); margin-bottom: 0.75rem;"></i>
+        <p style="color: var(--text-muted);">No pending events awaiting moderation review!</p>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Pending Reports Section -->
+  <div class="glass-panel">
+    <h2 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">
+      <i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-rose);"></i> Active Community Reports (<%= pendingReports.length %>)
+    </h2>
+
+    <% if (pendingReports && pendingReports.length > 0) { %>
+      <div class="data-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Reported Event</th>
+              <th>Reported By</th>
+              <th>Reason</th>
+              <th>Description</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% pendingReports.forEach(report => { %>
+              <tr>
+                <td>
+                  <% if (report.event) { %>
+                    <a href="/events/<%= report.event._id %>" style="font-weight: 700; color: #fff;"><%= report.event.title %></a>
+                  <% } else { %>
+                    <span style="color: var(--text-dim);">Event Deleted</span>
+                  <% } %>
+                </td>
+                <td><%= report.reportedBy ? report.reportedBy.name : 'User' %></td>
+                <td><span class="status-badge status-rejected"><%= report.reason %></span></td>
+                <td style="max-width: 250px; font-size: 0.85rem;"><%= report.description %></td>
+                <td>
+                  <div style="display: flex; gap: 0.5rem;">
+                    <form action="/moderation/reports/<%= report._id %>/resolve" method="POST" style="display: inline;">
+                      <input type="hidden" name="hideEvent" value="true">
+                      <button type="submit" class="btn btn-danger btn-sm" title="Resolve & Hide Event"><i class="fa-solid fa-ban"></i> Hide Event</button>
+                    </form>
+                    <form action="/moderation/reports/<%= report._id %>/dismiss" method="POST" style="display: inline;">
+                      <button type="submit" class="btn btn-secondary btn-sm" title="Dismiss Report">Dismiss</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div style="text-align: center; padding: 2rem;">
+        <i class="fa-solid fa-shield-check" style="font-size: 2.5rem; color: var(--accent-emerald); margin-bottom: 0.75rem;"></i>
+        <p style="color: var(--text-muted);">No active user reports!</p>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<!-- Dynamic Reject Modal -->
+<div id="dynamicRejectModal" class="modal-overlay">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h3 class="modal-title">Reject Event</h3>
+      <button onclick="closeModal('dynamicRejectModal')" class="alert-close">&times;</button>
+    </div>
+    <form id="dynamicRejectForm" method="POST">
+      <div class="form-group">
+        <label for="rejectionReasonInput" class="form-label">Rejection Reason / Feedback for Organizer</label>
+        <textarea id="rejectionReasonInput" name="reason" class="form-control" required placeholder="Explain what guidelines were violated..."></textarea>
+      </div>
+      <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+        <button type="button" onclick="closeModal('dynamicRejectModal')" class="btn btn-secondary">Cancel</button>
+        <button type="submit" class="btn btn-danger">Confirm Rejection</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function openRejectModal(eventId) {
+    const form = document.getElementById('dynamicRejectForm');
+    form.action = '/moderation/events/' + eventId + '/reject';
+    openModal('dynamicRejectModal');
+  }
+</script>
+
+<%- include('partials/footer') %>

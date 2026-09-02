@@ -1,0 +1,119 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<main class="container">
+  <div class="dashboard-header">
+    <div>
+      <h1 class="dashboard-title">Platform Superadmin Console</h1>
+      <p class="dashboard-subtitle">Global system metrics, security governance, user management, and event operations</p>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="/admin/users" class="btn btn-primary"><i class="fa-solid fa-users-gear"></i> Manage Users</a>
+      <a href="/moderation" class="btn btn-secondary"><i class="fa-solid fa-shield-halved"></i> Moderation Queue</a>
+    </div>
+  </div>
+
+  <%- include('partials/messages') %>
+
+  <!-- Admin Metrics Grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon stat-purple"><i class="fa-solid fa-users"></i></div>
+      <div class="stat-info">
+        <span class="stat-value"><%= metrics.totalUsers %></span>
+        <span class="stat-label">Total Registered Users</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon stat-cyan"><i class="fa-solid fa-calendar-days"></i></div>
+      <div class="stat-info">
+        <span class="stat-value"><%= metrics.totalEvents %></span>
+        <span class="stat-label">Total System Events</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon stat-green"><i class="fa-solid fa-circle-check"></i></div>
+      <div class="stat-info">
+        <span class="stat-value"><%= metrics.approvedEvents %></span>
+        <span class="stat-label">Approved Events</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon stat-amber"><i class="fa-solid fa-hourglass-half"></i></div>
+      <div class="stat-info">
+        <span class="stat-value"><%= metrics.pendingEvents %></span>
+        <span class="stat-label">Pending Events</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon stat-green"><i class="fa-solid fa-ticket"></i></div>
+      <div class="stat-info">
+        <span class="stat-value"><%= metrics.totalRegistrations %></span>
+        <span class="stat-label">Active Ticket Registrations</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon stat-rose"><i class="fa-solid fa-flag"></i></div>
+      <div class="stat-info">
+        <span class="stat-value"><%= metrics.pendingReports %></span>
+        <span class="stat-label">Pending User Reports</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon stat-cyan"><i class="fa-solid fa-handshake"></i></div>
+      <div class="stat-info">
+        <span class="stat-value"><%= metrics.totalSponsorships %></span>
+        <span class="stat-label">Active Partnerships</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Platform Users Table -->
+  <div class="glass-panel" style="margin-bottom: 2.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+      <h2 style="font-size: 1.25rem; font-weight: 700; color: #fff;">Recently Registered Users</h2>
+      <a href="/admin/users" class="nav-link">View All Users <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+
+    <div class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>User Name</th>
+            <th>Email Address</th>
+            <th>Role</th>
+            <th>Account Status</th>
+            <th>Joined Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% recentUsers.forEach(u => { %>
+            <tr>
+              <td><strong style="color: #fff;"><%= u.name %></strong></td>
+              <td><%= u.email %></td>
+              <td><span class="role-tag role-<%= u.role %>"><%= u.role %></span></td>
+              <td>
+                <span class="status-badge <%= u.isActive ? 'status-approved' : 'status-rejected' %>">
+                  <%= u.isActive ? 'Active' : 'Disabled' %>
+                </span>
+              </td>
+              <td style="font-size: 0.85rem; color: var(--text-muted);"><%= new Date(u.createdAt).toLocaleDateString('en-US') %></td>
+              <td>
+                <a href="/admin/users" class="btn btn-secondary btn-sm"><i class="fa-solid fa-user-pen"></i> Manage</a>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<%- include('partials/footer') %>

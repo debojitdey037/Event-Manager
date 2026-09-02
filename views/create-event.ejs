@@ -1,0 +1,76 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<main class="container" style="max-width: 720px;">
+  <div class="glass-panel" style="margin-top: 1rem;">
+    <div style="margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+      <h1 style="font-size: 2rem; font-weight: 800; color: #fff;">Create New Event</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">Submit your event details for moderation approval</p>
+    </div>
+
+    <%- include('partials/messages') %>
+
+    <form action="/events/create" method="POST">
+      <div class="form-group">
+        <label for="title" class="form-label">Event Title</label>
+        <input type="text" id="title" name="title" class="form-control" placeholder="e.g. AI & Full-Stack Tech Summit 2026" value="<%= typeof event !== 'undefined' ? event.title || '' : '' %>" required>
+      </div>
+
+      <div class="form-group">
+        <label for="category" class="form-label">Category</label>
+        <select id="category" name="category" class="form-select" required>
+          <option value="">Select Category</option>
+          <% ['technology', 'business', 'music', 'sports', 'education', 'workshop', 'conference', 'networking', 'cultural', 'other'].forEach(cat => { %>
+            <option value="<%= cat %>" <%= typeof event !== 'undefined' && event.category === cat ? 'selected' : '' %>><%= cat.charAt(0).toUpperCase() + cat.slice(1) %></option>
+          <% }); %>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="description" class="form-label">Detailed Description</label>
+        <textarea id="description" name="description" class="form-control" placeholder="Describe the agenda, speakers, prerequisites..." required><%= typeof event !== 'undefined' ? event.description || '' : '' %></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="location" class="form-label">Location / Venue Address</label>
+        <input type="text" id="location" name="location" class="form-control" placeholder="e.g. Grand Convention Center, San Francisco or Online Stream URL" value="<%= typeof event !== 'undefined' ? event.location || '' : '' %>" required>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label for="eventDate" class="form-label">Date</label>
+          <input type="date" id="eventDate" name="eventDate" class="form-control" value="<%= typeof event !== 'undefined' && event.eventDate ? new Date(event.eventDate).toISOString().split('T')[0] : '' %>" required>
+        </div>
+
+        <div class="form-group">
+          <label for="startTime" class="form-label">Start Time</label>
+          <input type="time" id="startTime" name="startTime" class="form-control" value="<%= typeof event !== 'undefined' ? event.startTime || '' : '' %>" required>
+        </div>
+
+        <div class="form-group">
+          <label for="endTime" class="form-label">End Time</label>
+          <input type="time" id="endTime" name="endTime" class="form-control" value="<%= typeof event !== 'undefined' ? event.endTime || '' : '' %>" required>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label for="capacity" class="form-label">Capacity (Max Seats)</label>
+          <input type="number" id="capacity" name="capacity" class="form-control" min="1" placeholder="e.g. 100" value="<%= typeof event !== 'undefined' ? event.capacity || '' : '' %>" required>
+        </div>
+
+        <div class="form-group">
+          <label for="price" class="form-label">Price ($ USD, 0 for Free)</label>
+          <input type="number" id="price" name="price" class="form-control" min="0" step="0.01" placeholder="0" value="<%= typeof event !== 'undefined' ? event.price !== undefined ? event.price : '' : '' %>" required>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+        <a href="/organizer/dashboard" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Submit Event for Approval</button>
+      </div>
+    </form>
+  </div>
+</main>
+
+<%- include('partials/footer') %>

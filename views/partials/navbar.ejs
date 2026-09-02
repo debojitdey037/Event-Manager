@@ -1,0 +1,53 @@
+<nav class="navbar">
+  <div class="container nav-container">
+    <a href="/" class="brand-logo">
+      <div class="logo-icon"><i class="fa-solid fa-globe"></i></div>
+      EventSphere
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="/" class="nav-link"><i class="fa-solid fa-house"></i> Home</a></li>
+      <li><a href="/events" class="nav-link"><i class="fa-solid fa-calendar-days"></i> Events</a></li>
+
+      <% if (locals.user) { %>
+        <% if (user.role === 'attendee') { %>
+          <li><a href="/tickets" class="nav-link"><i class="fa-solid fa-ticket"></i> My Tickets</a></li>
+          <li><a href="/attendee/dashboard" class="nav-link"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+        <% } else if (user.role === 'organizer') { %>
+          <li><a href="/events/create" class="nav-link"><i class="fa-solid fa-plus"></i> Create Event</a></li>
+          <li><a href="/organizer/dashboard" class="nav-link"><i class="fa-solid fa-sliders"></i> Organizer Dashboard</a></li>
+        <% } else if (user.role === 'moderator') { %>
+          <li><a href="/moderation" class="nav-link"><i class="fa-solid fa-shield-halved"></i> Moderation</a></li>
+          <li><a href="/moderator/dashboard" class="nav-link"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+        <% } else if (user.role === 'sponsor') { %>
+          <li><a href="/sponsorships" class="nav-link"><i class="fa-solid fa-handshake"></i> Opportunities</a></li>
+          <li><a href="/sponsor/dashboard" class="nav-link"><i class="fa-solid fa-briefcase"></i> Dashboard</a></li>
+        <% } else if (user.role === 'superadmin') { %>
+          <li><a href="/admin/users" class="nav-link"><i class="fa-solid fa-users-gear"></i> Users</a></li>
+          <li><a href="/moderation" class="nav-link"><i class="fa-solid fa-shield-cat"></i> Moderation</a></li>
+          <li><a href="/admin/dashboard" class="nav-link"><i class="fa-solid fa-user-shield"></i> Admin Dashboard</a></li>
+        <% } %>
+
+        <li class="user-badge">
+          <a href="/profile" style="color: inherit; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-circle-user"></i>
+            <span><%= user.name.split(' ')[0] %></span>
+          </a>
+          <span class="role-tag role-<%= user.role %>"><%= user.role %></span>
+        </li>
+
+        <li>
+          <form action="/logout" method="POST" style="display: inline;">
+            <button type="submit" class="btn btn-secondary btn-sm">
+              <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </button>
+          </form>
+        </li>
+
+      <% } else { %>
+        <li><a href="/login" class="nav-link"><i class="fa-solid fa-right-to-bracket"></i> Login</a></li>
+        <li><a href="/register" class="btn btn-primary btn-sm"><i class="fa-solid fa-user-plus"></i> Register</a></li>
+      <% } %>
+    </ul>
+  </div>
+</nav>

@@ -1,0 +1,90 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<main class="container">
+  <div class="dashboard-header">
+    <div>
+      <h1 class="dashboard-title">Moderation Queue & Logs</h1>
+      <p class="dashboard-subtitle">Full platform overview for pending events, rejected events, and report history</p>
+    </div>
+    <a href="/moderator/dashboard" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+  </div>
+
+  <%- include('partials/messages') %>
+
+  <!-- Pending Queue -->
+  <div class="glass-panel" style="margin-bottom: 2.5rem;">
+    <h2 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">
+      Pending Moderation Queue (<%= pendingEvents.length %>)
+    </h2>
+    <% if (pendingEvents && pendingEvents.length > 0) { %>
+      <div class="data-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Organizer</th>
+              <th>Category</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% pendingEvents.forEach(event => { %>
+              <tr>
+                <td><a href="/events/<%= event._id %>" style="color: #fff; font-weight: 700;"><%= event.title %></a></td>
+                <td><%= event.organizer ? event.organizer.name : 'Unknown' %></td>
+                <td><span class="category-tag"><%= event.category %></span></td>
+                <td><%= new Date(event.eventDate).toLocaleDateString('en-US') %></td>
+                <td>
+                  <form action="/moderation/events/<%= event._id %>/approve" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                  </form>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <p style="color: var(--text-muted);">No pending events.</p>
+    <% } %>
+  </div>
+
+  <!-- Reports History -->
+  <div class="glass-panel">
+    <h2 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">
+      Community Reports History (<%= allReports.length %>)
+    </h2>
+    <% if (allReports && allReports.length > 0) { %>
+      <div class="data-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Event Title</th>
+              <th>Reporter</th>
+              <th>Reason</th>
+              <th>Status</th>
+              <th>Reviewed By</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% allReports.forEach(report => { %>
+              <tr>
+                <td><%= report.event ? report.event.title : 'Deleted Event' %></td>
+                <td><%= report.reportedBy ? report.reportedBy.name : 'User' %></td>
+                <td><span class="status-badge status-rejected"><%= report.reason %></span></td>
+                <td><span class="status-badge status-<%= report.status %>"><%= report.status %></span></td>
+                <td><%= report.reviewedBy ? report.reviewedBy.name : 'Unassigned' %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <p style="color: var(--text-muted);">No reports on file.</p>
+    <% } %>
+  </div>
+</main>
+
+<%- include('partials/footer') %>

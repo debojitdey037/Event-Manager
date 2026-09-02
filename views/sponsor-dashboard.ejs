@@ -1,0 +1,118 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<main class="container">
+  <div class="dashboard-header">
+    <div>
+      <h1 class="dashboard-title">Sponsor Portal</h1>
+      <p class="dashboard-subtitle">Fund premier events, place brand opportunities, and track your active sponsorships</p>
+    </div>
+    <a href="/sponsorships" class="btn btn-primary"><i class="fa-solid fa-handshake"></i> View Opportunities</a>
+  </div>
+
+  <%- include('partials/messages') %>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon stat-cyan"><i class="fa-solid fa-briefcase"></i></div>
+      <div class="stat-info">
+        <span class="stat-value"><%= stats.total %></span>
+        <span class="stat-label">Total Submitted Offers</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon stat-amber"><i class="fa-solid fa-hourglass-half"></i></div>
+      <div class="stat-info">
+        <span class="stat-value"><%= stats.pending %></span>
+        <span class="stat-label">Pending Review</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon stat-green"><i class="fa-solid fa-circle-check"></i></div>
+      <div class="stat-info">
+        <span class="stat-value"><%= stats.approved %></span>
+        <span class="stat-label">Approved Partnerships</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon stat-purple"><i class="fa-solid fa-dollar-sign"></i></div>
+      <div class="stat-info">
+        <span class="stat-value">$<%= stats.totalContributed %></span>
+        <span class="stat-label">Total Funded</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submitted Sponsorship Requests Table -->
+  <div class="glass-panel" style="margin-bottom: 2.5rem;">
+    <h2 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">My Sponsorship Requests</h2>
+
+    <% if (mySponsorships && mySponsorships.length > 0) { %>
+      <div class="data-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Sponsored Event</th>
+              <th>Organizer</th>
+              <th>Pledged Amount</th>
+              <th>Proposal Message</th>
+              <th>Status</th>
+              <th>Submitted</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% mySponsorships.forEach(item => { %>
+              <tr>
+                <td>
+                  <% if (item.event) { %>
+                    <a href="/events/<%= item.event._id %>" style="font-weight: 700; color: #fff;"><%= item.event.title %></a>
+                  <% } else { %>
+                    <span style="color: var(--text-dim);">Event Removed</span>
+                  <% } %>
+                </td>
+                <td><%= item.event && item.event.organizer ? item.event.organizer.name : 'N/A' %></td>
+                <td><strong style="color: var(--accent-emerald);">$<%= item.amount %></strong></td>
+                <td style="max-width: 250px; font-size: 0.85rem;"><%= item.message || 'No custom message' %></td>
+                <td><span class="status-badge status-<%= item.status %>"><%= item.status %></span></td>
+                <td style="font-size: 0.85rem; color: var(--text-muted);"><%= new Date(item.createdAt).toLocaleDateString('en-US') %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div style="text-align: center; padding: 2.5rem;">
+        <i class="fa-solid fa-handshake-slash" style="font-size: 2.5rem; color: var(--text-dim); margin-bottom: 0.75rem;"></i>
+        <p style="color: var(--text-muted);">You haven't submitted any sponsorship offers yet.</p>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Available Events for Sponsorship -->
+  <div style="margin-bottom: 3rem;">
+    <h2 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">Featured Events Seeking Sponsors</h2>
+    <div class="event-grid">
+      <% availableEvents.forEach(event => { %>
+        <div class="event-card">
+          <div class="event-card-header">
+            <span class="category-tag"><%= event.category %></span>
+            <span class="price-tag"><%= event.price === 0 ? 'FREE' : '$' + event.price %></span>
+          </div>
+          <div class="event-card-body">
+            <h3 class="event-title"><%= event.title %></h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;"><%= event.location %></p>
+          </div>
+          <div class="event-card-footer">
+            <a href="/events/<%= event._id %>" class="btn btn-primary btn-sm" style="width: 100%;"><i class="fa-solid fa-handshake"></i> Sponsor Event</a>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  </div>
+</main>
+
+<%- include('partials/footer') %>

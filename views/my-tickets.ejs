@@ -1,0 +1,61 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<main class="container">
+  <div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 2.25rem; font-weight: 800; color: #fff;">My Registered Tickets</h1>
+    <p style="color: var(--text-muted);">Manage your active event tickets and registration details</p>
+  </div>
+
+  <%- include('partials/messages') %>
+
+  <% if (typeof registrations !== 'undefined' && registrations.length > 0) { %>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+      <% registrations.forEach(ticket => { %>
+        <div class="glass-panel" style="position: relative; border-left: 4px solid <%= ticket.status === 'active' ? 'var(--accent-emerald)' : 'var(--accent-rose)' %>;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+            <span style="font-family: monospace; font-size: 0.9rem; font-weight: 700; color: var(--accent-cyan); background: rgba(6,182,212,0.15); padding: 0.3rem 0.65rem; border-radius: var(--radius-sm); border: 1px solid rgba(6,182,212,0.3);">
+              <%= ticket.ticketId %>
+            </span>
+            <span class="status-badge status-<%= ticket.status %>"><%= ticket.status %></span>
+          </div>
+
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem;">
+            <%= ticket.event ? ticket.event.title : 'Event Information Unavailable' %>
+          </h3>
+
+          <% if (ticket.event) { %>
+            <div style="font-size: 0.9rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem;">
+              <div><i class="fa-regular fa-calendar" style="color: var(--accent-purple);"></i> <%= new Date(ticket.event.eventDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) %></div>
+              <div><i class="fa-regular fa-clock" style="color: var(--accent-cyan);"></i> <%= ticket.event.startTime %> - <%= ticket.event.endTime %></div>
+              <div><i class="fa-solid fa-location-dot" style="color: var(--accent-pink);"></i> <%= ticket.event.location %></div>
+              <div><i class="fa-solid fa-user-tie" style="color: var(--accent-amber);"></i> Organizer: <%= ticket.event.organizer ? ticket.event.organizer.name : 'Unknown' %></div>
+            </div>
+
+            <div style="display: flex; gap: 0.75rem;">
+              <a href="/events/<%= ticket.event._id %>" class="btn btn-secondary btn-sm" style="flex: 1;">
+                <i class="fa-solid fa-circle-info"></i> Event Details
+              </a>
+              <% if (ticket.status === 'active') { %>
+                <form action="/tickets/<%= ticket._id %>/cancel" method="POST" style="flex: 1;" data-confirm="Are you sure you want to cancel your ticket registration for this event?">
+                  <button type="submit" class="btn btn-danger btn-sm" style="width: 100%;">
+                    <i class="fa-solid fa-ticket-simple"></i> Cancel Ticket
+                  </button>
+                </form>
+              <% } %>
+            </div>
+          <% } %>
+        </div>
+      <% }); %>
+    </div>
+  <% } else { %>
+    <div class="glass-panel" style="text-align: center; padding: 4rem 2rem;">
+      <i class="fa-solid fa-ticket-simple" style="font-size: 3rem; color: var(--text-dim); margin-bottom: 1rem;"></i>
+      <h2>No Tickets Found</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">You haven't registered for any events yet.</p>
+      <a href="/events" class="btn btn-primary"><i class="fa-solid fa-compass"></i> Discover Events</a>
+    </div>
+  <% } %>
+</main>
+
+<%- include('partials/footer') %>

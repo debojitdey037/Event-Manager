@@ -1,0 +1,42 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<main class="container">
+  <div class="dashboard-header">
+    <div>
+      <h1 class="dashboard-title">Sponsorship Opportunities</h1>
+      <p class="dashboard-subtitle">Browse active events seeking corporate partners, brand sponsors, and tech summit underwriters</p>
+    </div>
+    <a href="/sponsor/dashboard" class="btn btn-secondary"><i class="fa-solid fa-briefcase"></i> My Dashboard</a>
+  </div>
+
+  <%- include('partials/messages') %>
+
+  <div class="event-grid">
+    <% availableEvents.forEach(event => { %>
+      <div class="event-card">
+        <div class="event-card-header">
+          <span class="category-tag"><%= event.category %></span>
+          <span class="price-tag"><%= event.price === 0 ? 'FREE' : '$' + event.price %></span>
+        </div>
+        <div class="event-card-body">
+          <h3 class="event-title"><%= event.title %></h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;"><%= event.description %></p>
+          <div class="event-meta">
+            <div class="event-meta-item">
+              <i class="fa-solid fa-user-tie"></i> Organizers: <%= event.organizer ? event.organizer.name : 'Unknown' %>
+            </div>
+            <div class="event-meta-item">
+              <i class="fa-solid fa-users"></i> Capacity: <%= event.capacity %> attendees
+            </div>
+          </div>
+        </div>
+        <div class="event-card-footer">
+          <a href="/events/<%= event._id %>" class="btn btn-primary btn-sm" style="width: 100%;">View & Offer Sponsorship</a>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+</main>
+
+<%- include('partials/footer') %>

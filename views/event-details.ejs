@@ -1,0 +1,220 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<main class="container">
+  <%- include('partials/messages') %>
+
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+    <!-- Left Main Column -->
+    <div>
+      <div class="glass-panel" style="margin-bottom: 2rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+          <span class="category-tag"><%= event.category %></span>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <span class="status-badge status-<%= event.status %>"><%= event.status %></span>
+            <span class="price-tag" style="font-size: 1.5rem;"><%= event.price === 0 ? 'FREE' : '$' + event.price %></span>
+          </div>
+        </div>
+
+        <h1 style="font-size: 2.25rem; font-weight: 800; color: #fff; margin-bottom: 1rem;"><%= event.title %></h1>
+
+        <div style="display: flex; gap: 1.5rem; color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; flex-wrap: wrap;">
+          <div><i class="fa-solid fa-user-tie" style="color: var(--accent-purple);"></i> Hosted by <strong><%= event.organizer ? event.organizer.name : 'Unknown' %></strong></div>
+          <div><i class="fa-regular fa-calendar-check" style="color: var(--accent-cyan);"></i> <%= new Date(event.eventDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) %></div>
+          <div><i class="fa-regular fa-clock" style="color: var(--accent-amber);"></i> <%= event.startTime %> - <%= event.endTime %></div>
+        </div>
+
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+          About This Event
+        </h3>
+
+        <div style="color: var(--text-main); font-size: 1.05rem; line-height: 1.8; white-space: pre-line; margin-bottom: 2rem;">
+          <%= event.description %>
+        </div>
+
+        <!-- Venue / Location Details -->
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+          Location & Venue
+        </h3>
+        <div style="display: flex; align-items: center; gap: 0.75rem; background: rgba(255,255,255,0.03); padding: 1rem 1.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+          <i class="fa-solid fa-location-dot" style="font-size: 1.5rem; color: var(--accent-rose);"></i>
+          <div>
+            <div style="font-weight: 700; color: #fff;"><%= event.location %></div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Check event update notices for specific venue hall details.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Approved Sponsors List -->
+      <% if (sponsorships && sponsorships.length > 0) { %>
+        <div class="glass-panel" style="margin-bottom: 2rem;">
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 1rem;">
+            <i class="fa-solid fa-handshake" style="color: var(--accent-cyan);"></i> Official Event Sponsors
+          </h3>
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <% sponsorships.forEach(s => { %>
+              <div style="background: rgba(255,255,255,0.05); padding: 0.75rem 1.25rem; border-radius: var(--radius-full); border: 1px solid var(--border-color); font-weight: 600; color: #fff;">
+                <i class="fa-solid fa-award" style="color: var(--accent-amber);"></i> <%= s.sponsor ? s.sponsor.name : 'Sponsor' %>
+              </div>
+            <% }); %>
+          </div>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Right Sidebar / Action Card -->
+    <div>
+      <div class="glass-panel" style="position: sticky; top: 100px;">
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">Registration & Actions</h3>
+
+        <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
+            <span style="color: var(--text-muted);">Registered Capacity</span>
+            <span style="font-weight: 700; color: #fff;"><%= event.registeredCount %> / <%= event.capacity %></span>
+          </div>
+          <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+            <div style="width: <%= Math.min(100, Math.round((event.registeredCount / event.capacity) * 100)) %>%; height: 100%; background: linear-gradient(90deg, var(--accent-purple), var(--accent-emerald));"></div>
+          </div>
+        </div>
+
+        <% if (locals.user) { %>
+          <% if (user.role === 'attendee') { %>
+            <% if (isRegistered) { %>
+              <div class="alert alert-success" style="margin-bottom: 1rem;">
+                <span><i class="fa-solid fa-circle-check"></i> You are registered for this event!</span>
+              </div>
+              <a href="/tickets/<%= userRegistration._id %>" class="btn btn-secondary" style="width: 100%; margin-bottom: 1rem;">
+                <i class="fa-solid fa-ticket"></i> View Ticket (<%= userRegistration.ticketId %>)
+              </a>
+            <% } else if (event.registeredCount >= event.capacity) { %>
+              <button class="btn btn-secondary" style="width: 100%; cursor: not-allowed;" disabled>
+                <i class="fa-solid fa-ban"></i> Event Sold Out
+              </button>
+            <% } else if (event.status !== 'approved') { %>
+              <button class="btn btn-secondary" style="width: 100%; cursor: not-allowed;" disabled>
+                Pending Moderation
+              </button>
+            <% } else { %>
+              <form action="/events/<%= event._id %>/register" method="POST">
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.9rem; font-size: 1.05rem; margin-bottom: 1rem;">
+                  <i class="fa-solid fa-ticket"></i> Register Now
+                </button>
+              </form>
+            <% } %>
+
+          <% } else if (user.role === 'sponsor') { %>
+            <button onclick="openModal('sponsorModal')" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">
+              <i class="fa-solid fa-handshake"></i> Sponsor This Event
+            </button>
+
+          <% } else if (user.role === 'organizer' && event.organizer._id.toString() === user._id.toString()) { %>
+            <a href="/events/<%= event._id %>/edit" class="btn btn-primary" style="width: 100%; margin-bottom: 0.75rem;">
+              <i class="fa-solid fa-pen-to-square"></i> Edit Event
+            </a>
+            <form action="/events/<%= event._id %>/cancel" method="POST" data-confirm="Are you sure you want to cancel this event?">
+              <button type="submit" class="btn btn-danger" style="width: 100%; margin-bottom: 0.75rem;">
+                <i class="fa-solid fa-xmark"></i> Cancel Event
+              </button>
+            </form>
+
+          <% } else if (user.role === 'moderator') { %>
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+              <form action="/moderation/events/<%= event._id %>/approve" method="POST" style="flex: 1;">
+                <button type="submit" class="btn btn-success btn-sm" style="width: 100%;">Approve</button>
+              </form>
+              <button onclick="openModal('rejectModal')" class="btn btn-danger btn-sm" style="flex: 1;">Reject</button>
+            </div>
+          <% } %>
+
+          <!-- Report Event Button -->
+          <button onclick="openModal('reportModal')" class="btn btn-secondary btn-sm" style="width: 100%; margin-top: 0.5rem;">
+            <i class="fa-solid fa-flag"></i> Report Event
+          </button>
+
+        <% } else { %>
+          <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">Log in to register or submit sponsorship offers.</p>
+            <a href="/login" class="btn btn-primary" style="width: 100%;">Log In to Register</a>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Sponsor Modal -->
+<div id="sponsorModal" class="modal-overlay">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h3 class="modal-title"><i class="fa-solid fa-handshake" style="color: var(--accent-cyan);"></i> Submit Sponsorship Offer</h3>
+      <button onclick="closeModal('sponsorModal')" class="alert-close">&times;</button>
+    </div>
+    <form action="/events/<%= event._id %>/sponsor" method="POST">
+      <div class="form-group">
+        <label for="amount" class="form-label">Sponsorship Amount ($)</label>
+        <input type="number" id="amount" name="amount" class="form-control" min="1" placeholder="e.g. 500" required>
+      </div>
+      <div class="form-group">
+        <label for="message" class="form-label">Message / Partnership Proposal</label>
+        <textarea id="message" name="message" class="form-control" placeholder="Describe your brand alignment and expectations..."></textarea>
+      </div>
+      <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+        <button type="button" onclick="closeModal('sponsorModal')" class="btn btn-secondary">Cancel</button>
+        <button type="submit" class="btn btn-primary">Submit Offer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Report Modal -->
+<div id="reportModal" class="modal-overlay">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h3 class="modal-title"><i class="fa-solid fa-flag" style="color: var(--accent-rose);"></i> Report Event</h3>
+      <button onclick="closeModal('reportModal')" class="alert-close">&times;</button>
+    </div>
+    <form action="/events/<%= event._id %>/report" method="POST">
+      <div class="form-group">
+        <label for="reason" class="form-label">Reason for Report</label>
+        <select id="reason" name="reason" class="form-select" required>
+          <option value="spam">Spam or Unwanted Commercial Content</option>
+          <option value="fraud">Fraudulent or Fake Event</option>
+          <option value="inappropriate">Inappropriate or Explicit Material</option>
+          <option value="misleading">Misleading Event Details</option>
+          <option value="duplicate">Duplicate Event Listing</option>
+          <option value="other">Other Violation</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="description" class="form-label">Detailed Explanation</label>
+        <textarea id="description" name="description" class="form-control" placeholder="Provide details to assist moderation..." required></textarea>
+      </div>
+      <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+        <button type="button" onclick="closeModal('reportModal')" class="btn btn-secondary">Cancel</button>
+        <button type="submit" class="btn btn-danger">Submit Report</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Reject Modal (Moderators) -->
+<div id="rejectModal" class="modal-overlay">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h3 class="modal-title"><i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-rose);"></i> Reject Event</h3>
+      <button onclick="closeModal('rejectModal')" class="alert-close">&times;</button>
+    </div>
+    <form action="/moderation/events/<%= event._id %>/reject" method="POST">
+      <div class="form-group">
+        <label for="rejectionReason" class="form-label">Reason for Rejection</label>
+        <textarea id="rejectionReason" name="reason" class="form-control" placeholder="Explain why this event is being rejected..." required></textarea>
+      </div>
+      <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+        <button type="button" onclick="closeModal('rejectModal')" class="btn btn-secondary">Cancel</button>
+        <button type="submit" class="btn btn-danger">Confirm Rejection</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

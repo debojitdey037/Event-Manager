@@ -1,0 +1,24 @@
+<% if (typeof success_msg !== 'undefined' && success_msg && success_msg.length > 0) { %>
+  <div class="alert alert-success">
+    <span><i class="fa-solid fa-circle-check"></i> <%= success_msg %></span>
+    <button class="alert-close">&times;</button>
+  </div>
+<% } %>
+
+<% if (typeof error_msg !== 'undefined' && error_msg && error_msg.length > 0) { %>
+  <div class="alert alert-error">
+    <span><i class="fa-solid fa-triangle-exclamation"></i> <%= error_msg %></span>
+    <button class="alert-close">&times;</button>
+  </div>
+<% } %>
+
+<% if (typeof errors !== 'undefined' && errors && errors.length > 0) { %>
+  <div class="alert alert-error" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
+    <div style="font-weight: 700;"><i class="fa-solid fa-circle-exclamation"></i> Please fix the following errors:</div>
+    <ul style="padding-left: 1.25rem; margin: 0;">
+      <% errors.forEach(function(err) { %>
+        <li><%= err %></li>
+      <% }); %>
+    </ul>
+  </div>
+<% } %>

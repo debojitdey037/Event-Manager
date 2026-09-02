@@ -1,0 +1,24 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<main class="container" style="text-align: center; padding: 4rem 1rem;">
+  <div class="glass-panel" style="max-width: 500px; margin: 0 auto;">
+    <h2 style="font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 1rem;">Redirecting to Your Dashboard...</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">Please wait while we route you to your role-specific control panel.</p>
+    <script>
+      <% if (locals.user) { %>
+        const role = "<%= user.role %>";
+        if (role === 'organizer') window.location.href = '/organizer/dashboard';
+        else if (role === 'attendee') window.location.href = '/attendee/dashboard';
+        else if (role === 'moderator') window.location.href = '/moderator/dashboard';
+        else if (role === 'sponsor') window.location.href = '/sponsor/dashboard';
+        else if (role === 'superadmin') window.location.href = '/admin/dashboard';
+        else window.location.href = '/';
+      <% } else { %>
+        window.location.href = '/login';
+      <% } %>
+    </script>
+  </div>
+</main>
+
+<%- include('partials/footer') %>
