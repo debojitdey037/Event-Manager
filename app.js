@@ -101,8 +101,12 @@ app.use((req, res) => {
 // Centralized Error Handling Middleware
 app.use(errorHandler);
 
-// Start Application Server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`EventSphere Platform running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-});
+// Export app for Vercel serverless deployment & start server locally
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`EventSphere Platform running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+  });
+}
+
+module.exports = app;
